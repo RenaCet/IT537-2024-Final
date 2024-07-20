@@ -11,6 +11,9 @@
       </li>
     </ul>
     <div v-if="error" class="text-red-500 text-center mt-4">Error: {{ error.message }}</div>
+    <div class="text-center mt-6">
+      <button @click="loadMore" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">More</button>
+    </div>
   </div>
 </template>
 
@@ -23,14 +26,26 @@ export default {
     return {
       coins: [],
       error: null,
+      page: 1,
     };
   },
   async created() {
     try {
-      this.coins = await getCryptocurrencyPrices();
+      this.coins = await getCryptocurrencyPrices(this.page);
     } catch (error) {
       this.error = error;
     }
+  },
+  methods: {
+    async loadMore() {
+      this.page += 1;
+      try {
+        const newCoins = await getCryptocurrencyPrices(this.page);
+        this.coins = [...this.coins, ...newCoins];
+      } catch (error) {
+        this.error = error;
+      }
+    },
   },
 };
 </script>
