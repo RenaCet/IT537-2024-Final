@@ -1,4 +1,3 @@
-// src/api/crypto.js
 import axios from 'axios';
 
 const BASE_URL = 'https://api.coingecko.com/api/v3';
