@@ -1,7 +1,7 @@
 <template>
   <div class="container mx-auto p-4">
     <h1 class="text-3xl font-bold mb-4 text-center">Contact Us</h1>
-    <div class="bg-white shadow-lg rounded-lg p-6">
+    <div class="bg-white shadow-lg rounded-lg p-6 max-w-lg mx-auto">
       <form class="space-y-4">
         <div>
           <label class="block text-sm font-medium text-gray-700" for="name">Name</label>
@@ -30,7 +30,6 @@ export default {
 </script>
 
 <style scoped>
-/* Add your styles here */
 body {
   font-family: 'Inter', sans-serif;
   background-color: #f4f4f9;
