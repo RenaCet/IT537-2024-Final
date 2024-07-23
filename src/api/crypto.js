@@ -7,7 +7,6 @@ export const getCryptocurrencyPrices = async (page = 1, perPage = 15) => {
     const response = await axios.get(`${BASE_URL}/coins/markets`, {
       params: {
         vs_currency: 'usd',
-        order: 'market_cap_desc',
         page,
         per_page: perPage,
       },
@@ -19,46 +18,45 @@ export const getCryptocurrencyPrices = async (page = 1, perPage = 15) => {
   }
 };
 
-export const getTopGainers = async () => {
+export const getTopGainersAndLosers = async () => {
   try {
-    const response = await axios.get(`${BASE_URL}/coins/markets`, {
+    const responseToday = await axios.get(`${BASE_URL}/coins/markets`, {
       params: {
         vs_currency: 'usd',
-        order: 'percent_change_24h_desc',
-        per_page: 5,
+        order: 'market_cap_desc',
+        per_page: 100,
         page: 1,
       },
     });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching top gainers:', error);
-    throw error;
-  }
-};
-
-export const getTopLosers = async () => {
-  try {
-    const response = await axios.get(`${BASE_URL}/coins/markets`, {
+    
+    const responseYesterday = await axios.get(`${BASE_URL}/coins/markets`, {
       params: {
         vs_currency: 'usd',
-        order: 'percent_change_24h_asc',
-        per_page: 5,
+        order: 'market_cap_desc',
+        per_page: 100,
         page: 1,
+        price_change_percentage: '24h',
       },
     });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching top losers:', error);
-    throw error;
-  }
-};
 
-export const getCryptoMarketNews = async () => {
-  try {
-    const response = await axios.get('https://cryptonews-api.com/api/v1?tickers=BTC,ETH&items=5&token=YOUR_API_KEY');
-    return response.data.news;
+    const todayData = responseToday.data;
+    const yesterdayData = responseYesterday.data;
+    
+    const gainersAndLosers = todayData.map((coin, index) => {
+      const yesterdayCoin = yesterdayData.find(y => y.id === coin.id);
+      const priceChangePercentage = ((coin.current_price - yesterdayCoin.current_price) / yesterdayCoin.current_price) * 100;
+      return {
+        ...coin,
+        price_change_percentage_24h: priceChangePercentage,
+      };
+    });
+
+    const topGainers = gainersAndLosers.sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h).slice(0, 5);
+    const topLosers = gainersAndLosers.sort((a, b) => a.price_change_percentage_24h - b.price_change_percentage_24h).slice(0, 5);
+
+    return { topGainers, topLosers };
   } catch (error) {
-    console.error('Error fetching crypto market news:', error);
+    console.error('Error fetching gainers and losers:', error);
     throw error;
   }
 };

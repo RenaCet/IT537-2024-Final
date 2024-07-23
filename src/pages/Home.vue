@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import { getCryptocurrencyPrices, getTopGainers, getTopLosers } from '../api/crypto';
+import { getCryptocurrencyPrices, getTopGainersAndLosers } from '../api/crypto';
 
 export default {
   name: 'Home',
@@ -76,8 +76,9 @@ export default {
   async created() {
     try {
       this.coins = await getCryptocurrencyPrices(this.page);
-      this.topGainers = await getTopGainers();
-      this.topLosers = await getTopLosers();
+      const { topGainers, topLosers } = await getTopGainersAndLosers();
+      this.topGainers = topGainers;
+      this.topLosers = topLosers;
     } catch (error) {
       this.error = error;
     }
